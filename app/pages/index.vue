@@ -3,6 +3,12 @@
     <div class="px-4 sm:px-6 lg:px-8 py-12">
       <h1 class="text-4xl font-bold mb-4">Welcome to Nine Garage</h1>
       <p class="text-lg text-gray-600 dark:text-gray-400">Your premium garage management solution</p>
+      <UContainer class="mt-8">
+        <img
+          src="~/assets/images/main/images.jpg"
+          alt="Nine Garage Hero Image"
+          class="w-full h-auto rounded-lg shadow-lg"></img>
+      </UContainer>
     </div>
   </div>
 </template>

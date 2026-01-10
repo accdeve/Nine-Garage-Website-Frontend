@@ -107,8 +107,6 @@
 </template>
 
 <script setup lang="ts">
-import Logo from '~/components/Logo.vue'
-
 const appConfig = useAppConfig()
 const isMobileMenuOpen = ref(false)
 </script>
