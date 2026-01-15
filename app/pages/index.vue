@@ -1,14 +1,27 @@
+<script setup lang="ts">
+import HomeSearch from "./home/HomeSearch.vue";
+import HomeCarousel from "./home/HomeCarousel.vue";
+import HomeProducts from "./home/HomeProducts.vue";
+import HomeChangeBooking from "./home/HomeChangeBooking.vue";
+import HomeFindUs from "./home/HomeFindUs.vue";
+import HomeWhyUs from "./home/HomeWhyUs.vue";
+import HomePartner from "./home/HomePartner.vue";
+import HomeComments from "./home/HomeComments.vue";
+import HomeArticle from "./home/HomeArticle.vue";
+import HomeFaq from "./home/HomeFaq.vue";
+</script>
+
 <template>
-  <div class="min-h-screen bg-gray-50 dark:bg-slate-950">
-    <div class="px-4 sm:px-6 lg:px-8 py-12">
-      <h1 class="text-4xl font-bold mb-4">Welcome to Nine Garage</h1>
-      <p class="text-lg text-gray-600 dark:text-gray-400">Your premium garage management solution</p>
-      <UContainer class="mt-8">
-        <img
-          src="~/assets/images/main/images.jpg"
-          alt="Nine Garage Hero Image"
-          class="w-full h-auto rounded-lg shadow-lg"></img>
-      </UContainer>
-    </div>
+  <div class="">
+    <HomeSearch />
+    <HomeCarousel />
+    <HomeProducts />
+    <HomeChangeBooking />
+    <HomeFindUs />
+    <HomeWhyUs />
+    <HomePartner />
+    <HomeComments/>
+    <HomeArticle />
+    <HomeFaq />
   </div>
 </template>
