@@ -24,6 +24,6 @@ defineProps<{
     </p>
 
     <!-- Button placeholder -->
-    <UButton trailing-icon="i-lucide-arrow-right" size="md" active-color="primary" class="mt-4">Button</UButton>
+    <UButton trailing-icon="i-lucide-arrow-right" size="md" active-color="primary" class="mt-4">Buat Janji Pemasangan</UButton>
   </div>
 </template>
