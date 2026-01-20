@@ -1,18 +1,17 @@
 <script setup lang="ts">
-import FaqItem from '~/components/home/FaqComponent.vue'
 
 const faqs = [
   {
-    question: 'Apakah perlu booking terlebih dahulu?',
-    answer: 'Ya, kami menyarankan booking agar tidak perlu antre dan layanan lebih maksimal.'
+    label: 'Apakah perlu booking terlebih dahulu?',
+    content: 'Ya, kami menyarankan booking agar tidak perlu antre dan layanan lebih maksimal.'
   },
   {
-    question: 'Berapa lama proses pemasangan aksesoris?',
-    answer: 'Waktu pemasangan tergantung jenis aksesoris, rata-rata 30–90 menit.'
+    label: 'Berapa lama proses pemasangan aksesoris?',
+    content: 'Waktu pemasangan tergantung jenis aksesoris, rata-rata 30–90 menit.'
   },
   {
-    question: 'Apakah tersedia garansi pemasangan?',
-    answer: 'Kami memberikan garansi pemasangan sesuai ketentuan yang berlaku.'
+    label: 'Apakah tersedia garansi pemasangan?',
+    content: 'Kami memberikan garansi pemasangan sesuai ketentuan yang berlaku.'
   }
 ]
 </script>
@@ -23,11 +22,6 @@ const faqs = [
       Pertanyaan yang umum diajukan
     </h3>
 
-    <FaqItem
-      v-for="(item, index) in faqs"
-      :key="index"
-      :question="item.question"
-      :answer="item.answer"
-    />
+    <UAccordion :items="faqs" />
   </section>
 </template>

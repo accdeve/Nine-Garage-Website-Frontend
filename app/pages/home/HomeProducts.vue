@@ -48,13 +48,15 @@ const products = [
       </div>
     </div>
 
-    <div class="px-5 py-5">
-      <UButton
-        class="w-full md:max-w-md mx-auto flex justify-center px-5 py-3"
-        size="md"
-      >
-        Booking Sekarang
-      </UButton>
-    </div>
+    <NuxtLink to="/booking">
+      <div class="px-5 py-5">
+        <UButton
+          class="w-full md:max-w-md mx-auto flex justify-center px-5 py-3"
+          size="md"
+        >
+          Booking Sekarang
+        </UButton>
+      </div>
+    </NuxtLink>
   </section>
 </template>
