@@ -7,7 +7,6 @@ import HomeFindUs from "./home/HomeFindUs.vue";
 import HomeWhyUs from "./home/HomeWhyUs.vue";
 import HomePartner from "./home/HomePartner.vue";
 import HomeComments from "./home/HomeComments.vue";
-import HomeArticle from "./home/HomeArticle.vue";
 import HomeFaq from "./home/HomeFaq.vue";
 </script>
 
@@ -21,7 +20,12 @@ import HomeFaq from "./home/HomeFaq.vue";
     <HomeWhyUs />
     <HomePartner />
     <HomeComments/>
-    <HomeArticle />
+    <!-- <HomeArticle /> -->
     <HomeFaq />
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
   </div>
 </template>

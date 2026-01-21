@@ -31,7 +31,7 @@ const testimonials = [
 
     <div
       class="
-       flex gap-4 overflow-x-auto no-scrollbar
+       flex gap-2 overflow-x-auto no-scrollbar
       "
     >
       <CommentComponent
