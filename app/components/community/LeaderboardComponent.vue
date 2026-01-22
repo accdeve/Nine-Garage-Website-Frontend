@@ -1,3 +1,27 @@
+<script setup lang="ts">
+import { computed } from 'vue'
+
+const props = defineProps({
+  name: {
+    type: String,
+    required: true
+  },
+  point: {
+    type: Number,
+    required: true
+  },
+  rank: {
+    type: Number,
+    required: true
+  },
+  avatar: {
+    type: String,
+    default: ''
+  }
+})
+
+const isTop = computed(() => props.rank === 1)
+</script>
 <template>
   <div
     :class="[
@@ -35,27 +59,4 @@
   </div>
 </template>
 
-<script setup lang="ts">
-import { computed } from 'vue'
 
-const props = defineProps({
-  name: {
-    type: String,
-    required: true
-  },
-  point: {
-    type: Number,
-    required: true
-  },
-  rank: {
-    type: Number,
-    required: true
-  },
-  avatar: {
-    type: String,
-    default: ''
-  }
-})
-
-const isTop = computed(() => props.rank === 1)
-</script>

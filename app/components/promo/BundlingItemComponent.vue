@@ -33,7 +33,11 @@ const open = ref(false);
             {{ title }}
           </p>
           <p class="text-xs text-gray-500">
-            {{ description }}
+            {{
+              description.length > 40
+                ? description.slice(0, 40) + "..."
+                : description
+            }}
           </p>
         </div>
 
