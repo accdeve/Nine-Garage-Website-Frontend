@@ -1,18 +1,21 @@
 <script setup lang="ts">
-import { computed } from 'vue'
+import { useRouter } from "vue-router";
+import { computed } from "vue";
 
 const props = defineProps<{
-  name: string
-  images: string[]
-}>()
+  name: string;
+  images: string[];
+}>();
+
+const router = useRouter();
 
 const slug = computed(() =>
-  props.name
-    .toLowerCase()
-    .replace(/\s+/g, '-')
-)
+  props.name.toLowerCase().replace(/\s+/g, "-")
+);
 
-console.log(slug.value)
+function goToDetail() {
+  router.push(`/community/${slug.value}`);
+}
 </script>
 
 <template>
@@ -20,12 +23,12 @@ console.log(slug.value)
     <div class="flex items-center justify-between">
       <h2 class="text-lg font-semibold">{{ name }}</h2>
 
-      <NuxtLink
-        :to="`/community/${slug}`"
+      <button
         class="text-sm text-primary hover:underline"
+        @click="goToDetail"
       >
         Lihat Semua
-      </NuxtLink>
+      </button>
     </div>
 
     <div class="flex gap-3 overflow-x-auto pb-2">
@@ -35,7 +38,7 @@ console.log(slug.value)
         class="shrink-0 rounded-lg overflow-hidden bg-gray-200"
         style="width:260px"
       >
-        <img :src="img" class="h-40 w-full object-cover" >
+        <img :src="img" class="h-40 w-full object-cover" loading="lazy">
       </div>
     </div>
   </div>
