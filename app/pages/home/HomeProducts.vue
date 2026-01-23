@@ -35,7 +35,7 @@ const products = [
       Pilih jenis produk atau pemasangan yang kamu inginkan
     </h2>
 
-    <div class="px-5 pb-10">
+    <div class="ml-4 pb-10">
       <div class="flex gap-4 overflow-x-auto no-scrollbar">
         <ProductCard
           v-for="product in products"

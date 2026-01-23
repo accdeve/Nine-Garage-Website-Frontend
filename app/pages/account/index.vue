@@ -9,7 +9,7 @@ const items = [
 
 <template>
   <section class="min-h-screen px-4 py-10 flex justify-center">
-    <div class="w-full max-w-[800px] space-y-6">
+    <div class="w-full max-w-200 space-y-6">
       <!-- Breadcrumb -->
       <UBreadcrumb :items="items" class="mb-4" />
 

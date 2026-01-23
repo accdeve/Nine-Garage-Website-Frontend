@@ -24,7 +24,7 @@ const testimonials = [
 </script>
 
 <template>
-  <section class="px-4">
+  <section class="ml-4">
     <h3 class="text-center text-2xl font-bold mb-8">
       Apa Kata Mereka
     </h3>

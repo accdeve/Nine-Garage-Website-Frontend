@@ -19,13 +19,12 @@ import HomeFaq from "./home/HomeFaq.vue";
     <HomeFindUs />
     <HomeWhyUs />
     <HomePartner />
-    <HomeComments/>
+    <HomeComments />
     <!-- <HomeArticle /> -->
     <HomeFaq />
-    <br>
-    <br>
-    <br>
-    <br>
-    <br>
+    <br >
+    <br >
+    <br >
+    <br >
   </div>
 </template>

@@ -1,13 +1,17 @@
 <script setup lang="ts">
-import { shallowRef, reactive, ref } from "vue";
-import type { CalendarDate } from "@internationalized/date";
+import { shallowRef, reactive, ref, computed } from "vue";
 import { today, getLocalTimeZone } from "@internationalized/date";
 import HourTimeComponent from "~/components/booking/HourTimeComponent.vue";
-// import { useTimeFormatter } from "~/composables/useTimeFormatter";
+import PreviewInputBooking from "./PreviewInputBooking.vue";
 
-const date = shallowRef<CalendarDate>(today(getLocalTimeZone()));
-
+const date = shallowRef(today(getLocalTimeZone()));
+const todayDate = today(getLocalTimeZone());
 const selectedHour = ref<number | null>(null);
+
+const items = [
+  { label: "Home", to: "/" },
+  { label: "Booking", to: "/booking" },
+];
 
 const state = reactive({
   nama: "",
@@ -17,69 +21,95 @@ const state = reactive({
   vehicleColor: "",
 });
 
-const workshopBranch = ref<string[]>([
-  "Jl Arcadia Daan Mogot",
-  "Jelambar",
-  ...Array.from({ length: 200 }, (_, i) => `Workshop Cabang ${i + 1}`),
-]);
+const workshopBranch = ["Jl Arcadia Daan Mogot", "Jelambar"];
 const defaultWorkshopBranch = ref("Jelambar");
 
-const sourcleItem = ref<string[]>([
-  "Online",
-  "Workshop",
-]);
+const sourcleItem = ["Online", "Workshop"];
 const defaultSourcleItem = ref("Online");
 
-const productList = ref<string[]>([
+const productList = [
   "Lampu Tembak",
   "Lampu Jauh",
-   ...Array.from({ length: 200 }, (_, i) => `Product ${i + 1}`)
-]);
-const defaultProductList = ref([ "Lampu Tembak",
-  "Lampu Jauh"]);
-
-const items = [
-  { label: "Home", to: "/" },
-  { label: "Booking", to: "/booking" },
+  ...Array.from({ length: 200 }, (_, i) => `Product ${i + 1}`),
 ];
+const defaultProductList = ref<string[]>([]);
 
-const submit = () => {
-  console.log({
-    ...state,
-    date: date.value.toString(),
-    hour: selectedHour.value,
-  });
-};
+const openPreview = ref(false);
 
-// const { formatHour } = useTimeFormatter();
+const isFormComplete = computed(() => {
+  return (
+    state.nama &&
+    state.phone &&
+    state.vehicle &&
+    state.plate &&
+    state.vehicleColor &&
+    selectedHour.value !== null &&
+    defaultWorkshopBranch.value &&
+    defaultProductList.value.length > 0 &&
+    defaultSourcleItem.value
+  );
+});
+
+const previewData = computed(() => ({
+  nama: state.nama,
+  phone: state.phone,
+  vehicle: state.vehicle,
+  plate: state.plate,
+  vehicleColor: state.vehicleColor,
+  date: date.value.toString(),
+  hour: selectedHour.value,
+  branch: defaultWorkshopBranch.value,
+  products: defaultProductList.value,
+  source: defaultSourcleItem.value,
+}));
 </script>
 
 <template>
-  <section class="min-h-screen flex justify-center px-4 py-10">
-    <div class="w-full max-w-sm">
+  <section class="min-h-screen flex justify-center px-6 py-10">
+    <div class="w-full max-w-md">
       <UBreadcrumb :items="items" class="mb-6" />
 
-      <h2 class="text-2xl font-bold text-center mb-8">Form Booking Instalasi</h2>
+      <h2 class="text-2xl font-bold text-center mb-8">
+        Form Booking Instalasi
+      </h2>
 
-      <UForm :state="state" class="space-y-5" @submit="submit">
-        <UFormField label="Nama" name="nama" required>
-          <UInput v-model="state.nama" class="w-full" />
+      <UForm :state="state" class="space-y-5">
+        <UFormField label="Nama" name="nama" type="text" required>
+          <UInput v-model="state.nama" icon="i-lucide-user" class="w-full" />
         </UFormField>
 
-        <UFormField label="Nomor WhatsApp" name="phone" required>
-          <UInput v-model="state.phone" class="w-full" />
+        <UFormField label="Nomor WhatsApp" name="phone" type="tel" required>
+          <UInput v-model="state.phone" icon="i-lucide-phone" class="w-full" />
         </UFormField>
 
-        <UFormField label="Nama Kendaraan" name="vehicle" required>
-          <UInput v-model="state.vehicle" class="w-full" />
+        <UFormField
+          icon="i-lucide-car"
+          label="Nama Kendaraan"
+          name="vehicle"
+          required
+        >
+          <UInput v-model="state.vehicle" icon="i-lucide-car" class="w-full" />
         </UFormField>
 
-        <UFormField label="Nomor Plat Kendaraan" name="plate" required>
-          <UInput v-model="state.plate" class="w-full" />
+        <UFormField
+          icon="i-lucide-clipboard-list"
+          label="Nomor Plat Kendaraan"
+          name="plate"
+          required
+        >
+          <UInput
+            v-model="state.plate"
+            icon="i-lucide-clipboard-list"
+            class="w-full"
+          />
         </UFormField>
 
         <UFormField label="Warna Kendaraan" name="vehicleColor" required>
-          <UInput v-model="state.vehicleColor" class="w-full" />
+          <UInput
+            v-model="state.vehicleColor"
+            icon="i-lucide-paintbrush"
+            class="w-full"
+          />
         </UFormField>
 
         <div class="flex gap-1 items-start">
@@ -87,7 +117,7 @@ const submit = () => {
             <label class="text-sm font-medium block mb-2 text-align-left">
               Tanggal Booking
             </label>
-            <UCalendar v-model="date" size="sm" />
+            <UCalendar v-model="date" size="sm" :min-value="todayDate" />
           </div>
 
           <div>
@@ -98,7 +128,6 @@ const submit = () => {
                 :start-hour="8"
                 :end-hour="17"
               />
-
               <!-- <p v-if="selectedHour !== null" class="text-sm text-gray-600">
                 Jam yang dipilih: {{ formatHour(selectedHour) }}
               </p> -->
@@ -109,19 +138,40 @@ const submit = () => {
         <label class="text-sm font-medium block mb-2 text-align-left">
           Cabang Bengkel
         </label>
-        <USelectMenu v-model="defaultWorkshopBranch" :items="workshopBranch" class="w-full" />
+        <USelectMenu
+          v-model="defaultWorkshopBranch"
+          :items="workshopBranch"
+          class="w-full"
+        />
 
         <label class="text-sm font-medium block mb-2 text-align-left">
           Nama Product
         </label>
-        <USelectMenu v-model="defaultProductList" placeholder="Pilih Product"  multiple :items="productList" class="w-full" />
+        <USelectMenu
+          v-model="defaultProductList"
+          placeholder="Pilih Product"
+          multiple
+          :items="productList"
+          class="w-full"
+        />
 
         <label class="text-sm font-medium block mb-2 text-align-left">
           Asal Pembelian
         </label>
-        <USelectMenu v-model="defaultSourcleItem" :items="sourcleItem" class="w-full" />
+        <USelectMenu
+          v-model="defaultSourcleItem"
+          :items="sourcleItem"
+          class="w-full"
+        />
 
-        <UButton type="submit" block size="lg"> Kirim Booking </UButton>
+        <UDrawer v-model:open="openPreview" title="Konfirmasi Booking">
+          <UButton block type="button" size="lg" :disabled="!isFormComplete">
+            Preview Booking
+          </UButton>
+          <template #content>
+            <PreviewInputBooking :data="previewData"
+          /></template>
+        </UDrawer>
       </UForm>
     </div>
   </section>
