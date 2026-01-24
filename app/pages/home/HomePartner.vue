@@ -5,8 +5,6 @@
   <section class="overflow-hidden py-8 mt-6">
     <h3 class="text-center text-2xl font-bold mb-8">Partner Kami</h3>
 
-    <!-- Baris atas -->
-
   <UMarquee :overlay="false">
     <UIcon name="i-simple-icons-github" class="size-10 shrink-0" />
     <UIcon name="i-simple-icons-discord" class="size-10 shrink-0" />
@@ -18,7 +16,7 @@
 
   <br>
 
-    <!-- Baris bawah -->
+  
     <UMarquee reverse :overlay="false">
     <UIcon name="i-simple-icons-github" class="size-10 shrink-0" />
     <UIcon name="i-simple-icons-discord" class="size-10 shrink-0" />
