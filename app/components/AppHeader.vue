@@ -2,7 +2,7 @@
   <header class="bg-white flex justify-between items-center px-6 py-1">
     <!-- LEFT -->
     <NuxtLink to="/">
-      <div class="w-20 h-20">
+      <div class="w-10 h-10">
         <img
           src="/images/logo.png"
           alt="Logo"

@@ -20,11 +20,11 @@ const menus = [
     to: '/promo',
     icon: 'i-lucide-percent'
   },
-  {
-    label: 'Community',
-    to: '/community',
-    icon: 'i-lucide-users'
-  },
+  // {
+  //   label: 'Community',
+  //   to: '/community',
+  //   icon: 'i-lucide-users'
+  // },
   {
     label: 'Account',
     to: '/account',

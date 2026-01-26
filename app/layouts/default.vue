@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import AppHeader from '~/components/AppHeader.vue'
-import BottomNavbar from '~/components/BottomNavbar.vue'
+// import BottomNavbar from '~/components/BottomNavbar.vue'
 </script>
 
 <template>

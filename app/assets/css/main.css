@@ -10,6 +10,57 @@
   scrollbar-width: none;
 }
 
-/* body {
-  background-color: #f9fafb;
-} */
+body {
+  background-color: var(--color-background);
+  color: var(--color-neutral-900);
+}
+
+@theme static {
+  --color-primary: var(--color-primary-500);
+  --color-secondary: var(--color-neutral-900);
+  --color-accent: var(--color-accent-500);
+  --color-success: var(--color-success-500);
+  --color-warning: var(--color-warning-500);
+  --color-danger: var(--color-danger-500);
+  /* =====================
+     NEUTRAL (TEXT & UI)
+  ====================== */
+  --color-neutral-50:  #fafafa;
+  --color-neutral-100: #f5f5f7;
+  --color-neutral-200: #e5e5ea;
+  --color-neutral-300: #d2d2d7;
+  --color-neutral-600: #6e6e73;
+  --color-neutral-900: #1d1d1f;
+
+  /* =====================
+     BACKGROUND
+  ====================== */
+  --color-background:        #f5f5f5;
+  --color-background-subtle: #f5f5f7;
+  --color-background-elevated:#fbfbfd;
+
+  /* =====================
+     BORDER / DIVIDER
+  ====================== */
+  --color-border: #d2d2d7;
+
+  /* =====================
+     ACCENT (Apple Blue)
+  ====================== */
+  --color-accent-500: #0071e3;
+  --color-accent-600: #0063c7;
+
+  /* =====================
+     PRIMARY (GREEN)
+  ====================== */
+  --color-primary-500: #22c55e;
+  --color-primary-600: #16a34a;
+  --color-primary-700: #15803d;
+
+  /* =====================
+     STATE
+  ====================== */
+  --color-success-500: #22c55e;
+  --color-warning-500: #ff9f0a;
+  --color-danger-500:  #ff453a;
+}

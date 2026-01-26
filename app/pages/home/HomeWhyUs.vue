@@ -22,14 +22,13 @@ const slides = [
 </script>
 
 <template>
-  <section class="mt-7">
+  <section class="">
     <h3 class="text-center text-2xl font-bold mb-8">
       Mengapa kami menjadi tempat terbaik
     </h3>
 
     <UCarousel
       v-slot="{ item }"
-      arrows
       :items="slides"
       class="w-full max-w-xs mx-auto"
       :dots="true"

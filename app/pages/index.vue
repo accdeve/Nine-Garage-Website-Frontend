@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import HomeSearch from "./home/HomeSearch.vue";
+// import HomeSearch from "./home/HomeSearch.vue";
 import HomeCarousel from "./home/HomeCarousel.vue";
 import HomeProducts from "./home/HomeProducts.vue";
 import HomeChangeBooking from "./home/HomeChangeBooking.vue";
@@ -12,9 +12,10 @@ import HomeFaq from "./home/HomeFaq.vue";
 
 <template>
   <div class="">
-    <HomeSearch />
+    <!-- <HomeSearch /> -->
     <HomeCarousel />
     <HomeProducts />
+    <hr class="ml-5 mr-5 border-t-2 border-neutral-300 mb-5 mt-5">
     <HomeChangeBooking />
     <HomeFindUs />
     <HomeWhyUs />
@@ -22,9 +23,5 @@ import HomeFaq from "./home/HomeFaq.vue";
     <HomeComments />
     <!-- <HomeArticle /> -->
     <HomeFaq />
-    <br >
-    <br >
-    <br >
-    <br >
   </div>
 </template>
