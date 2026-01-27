@@ -113,56 +113,46 @@ const previewData = computed(() => ({
         </UFormField>
 
         <div class="flex gap-1 items-start">
-          <div>
-            <label class="text-sm font-medium block mb-2 text-align-left">
-              Tanggal Booking
-            </label>
+          <UFormField label="Tanggal Booking" required>
             <UCalendar v-model="date" size="sm" :min-value="todayDate" />
-          </div>
+          </UFormField>
 
-          <div>
-            <label class="text-sm font-medium block mb-2"> Jam Booking </label>
+          <UFormField label="Jam Booking" required class="flex-1">
             <div class="flex flex-col gap-2 mt-4">
               <HourTimeComponent
                 v-model="selectedHour"
                 :start-hour="8"
                 :end-hour="17"
               />
-              <!-- <p v-if="selectedHour !== null" class="text-sm text-gray-600">
-                Jam yang dipilih: {{ formatHour(selectedHour) }}
-              </p> -->
             </div>
-          </div>
+          </UFormField>
         </div>
 
-        <label class="text-sm font-medium block mb-2 text-align-left">
-          Cabang Bengkel
-        </label>
-        <USelectMenu
-          v-model="defaultWorkshopBranch"
-          :items="workshopBranch"
-          class="w-full"
-        />
+        <UFormField label="Cabang Bengkel" required>
+          <USelectMenu
+            v-model="defaultWorkshopBranch"
+            :items="workshopBranch"
+            class="w-full"
+          />
+        </UFormField>
 
-        <label class="text-sm font-medium block mb-2 text-align-left">
-          Nama Product
-        </label>
-        <USelectMenu
-          v-model="defaultProductList"
-          placeholder="Pilih Product"
-          multiple
-          :items="productList"
-          class="w-full"
-        />
+        <UFormField label="Nama Product" required>
+          <USelectMenu
+            v-model="defaultProductList"
+            placeholder="Pilih Product"
+            multiple
+            :items="productList"
+            class="w-full"
+          />
+        </UFormField>
 
-        <label class="text-sm font-medium block mb-2 text-align-left">
-          Asal Pembelian
-        </label>
-        <USelectMenu
-          v-model="defaultSourcleItem"
-          :items="sourcleItem"
-          class="w-full"
-        />
+        <UFormField label="Asal Pembelian" required>
+          <USelectMenu
+            v-model="defaultSourcleItem"
+            :items="sourcleItem"
+            class="w-full"
+          />
+        </UFormField>
 
         <UDrawer v-model:open="openPreview" title="Konfirmasi Booking">
           <UButton block type="button" size="lg" :disabled="!isFormComplete">

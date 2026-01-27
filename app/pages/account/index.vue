@@ -43,6 +43,8 @@ const items = [
           trailing-icon="i-lucide-chevron-right"
           leading-icon="i-lucide-user"
           size="md"
+          variant="ghost"
+          color="secondary"
         >
           Ganti Profil
         </UButton>
@@ -53,6 +55,8 @@ const items = [
           trailing-icon="i-lucide-chevron-right"
           leading-icon="i-lucide-lock"
           size="md"
+          variant="ghost"
+          color="secondary"
         >
           Ganti Password
         </UButton>
@@ -70,6 +74,8 @@ const items = [
           trailing-icon="i-lucide-chevron-right"
           leading-icon="i-lucide-book-open"
           size="md"
+          variant="ghost"
+          color="secondary"
         >
           Riwayat Booking
         </UButton>
@@ -80,6 +86,8 @@ const items = [
           trailing-icon="i-lucide-chevron-right"
           leading-icon="i-lucide-star"
           size="md"
+          variant="ghost"
+          color="secondary"
         >
           Point
         </UButton>
@@ -90,6 +98,8 @@ const items = [
           trailing-icon="i-lucide-chevron-right"
           leading-icon="i-lucide-gift"
           size="md"
+          variant="ghost"
+          color="secondary"
         >
           Kode Referal
         </UButton>
@@ -98,6 +108,8 @@ const items = [
         <UButton
           block
           variant="outline"
+          style="color: black;"
+          color="error"
           class="py-3 px-3 rounded-2xl mt-10 text-white hover:bg-red-600"
           trailing-icon="i-lucide-chevron-right"
           leading-icon="i-lucide-log-out"

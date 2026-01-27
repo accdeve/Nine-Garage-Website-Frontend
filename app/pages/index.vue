@@ -19,8 +19,11 @@ import HomeFaq from "./home/HomeFaq.vue";
     <HomeChangeBooking />
     <HomeFindUs />
     <HomeWhyUs />
+    <hr class="ml-5 mr-5 border-t-2 border-neutral-300 mt-15">
     <HomePartner />
+    <hr class="ml-5 mr-5 border-t-2 border-neutral-300 mt-15 mb-5">
     <HomeComments />
+    <hr class="ml-5 mr-5 border-t-2 border-neutral-300 mt-15 mb-5">
     <!-- <HomeArticle /> -->
     <HomeFaq />
   </div>

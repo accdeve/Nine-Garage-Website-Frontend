@@ -2,7 +2,7 @@
 </script>
 
 <template>
-  <section class="overflow-hidden py-8 mt-6">
+  <section class="overflow-hidden mt-5">
     <h3 class="text-center text-2xl font-bold mb-8">Partner Kami</h3>
 
   <UMarquee :overlay="false">

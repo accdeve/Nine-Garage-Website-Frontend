@@ -9,7 +9,7 @@
 
     <div class="flex items-center justify-center gap-1 mx-10 mt-3">
       <div class="w-full py-5 flex justify-center">
-        <UInput class="w-96 mx-auto" style="background-color: var(--color-neutral-50); color: var(--neutral);" placeholder="cth: 09182h726" size="md" />
+        <UInput class="w-96 mx-auto" placeholder="cth: 09182h726" size="md" />
       </div>
       <UButton variant="outline"> Cek </UButton>
     </div>

@@ -48,7 +48,6 @@ const lampuItems = [
 <template>
   <section class="min-h-screen flex justify-center px-4 py-10">
     <div class="w-full max-w-sm">
-
       <!-- Breadcrumb -->
       <UBreadcrumb
         :items="[
@@ -67,8 +66,7 @@ const lampuItems = [
 
       <!-- Tabs dengan slot -->
       <div class="overflow-x-auto no-scrollbar">
-        <UTabs :items="tabs" color="neutral" variant="link" class="min-w-max">
-          
+        <UTabs :items="tabs" variant="link" class="min-w-max">
           <!-- Slot konten untuk Bundling -->
           <template #bundling>
             <div class="flex flex-col space-y-4 mt-4">
@@ -98,7 +96,6 @@ const lampuItems = [
               />
             </div>
           </template>
-
         </UTabs>
       </div>
     </div>

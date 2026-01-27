@@ -8,7 +8,7 @@ defineProps<{
 </script>
 
 <template>
-  <UCard variant="subtle" class="p-1">
+  <UCard variant="outline" class="p-1 bg-neutral-100">
     <div class="flex items-start justify-between">
       <!-- Kiri -->
       <div class="flex items-center gap-2">

@@ -17,7 +17,7 @@ const faqs = [
 </script>
 
 <template>
-  <section class="max-w-2xl mx-auto mt-8 px-4">
+  <section class="max-w-2xl mx-auto mt-5 px-4">
     <h3 class="text-center text-2xl font-bold mb-6 px-6">
       Pertanyaan yang umum diajukan
     </h3>
