@@ -31,8 +31,8 @@ export async function apiRequest<T>(
     return (await $fetch<T>(url, {
       baseURL: config.public.apiBaseUrl as string,
       method: options.method ?? "GET",
-      params: options.params as Record<string, any> | undefined,
-      body: options.body as BodyInit | Record<string, any> | null | undefined,
+      params: options.params as Record<string, never> | undefined,
+      body: options.body as BodyInit | Record<string, never> | null | undefined,
       headers: {
         Accept: "application/json",
         "Content-Type": "application/json",
