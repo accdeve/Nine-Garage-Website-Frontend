@@ -1,4 +1,6 @@
-export default async function (event: any) {
+import type { H3Event } from "h3";
+
+export default async function (event: H3Event) {
   // Skip auth for login/register endpoints and public routes
   const publicPaths = [
     "/api/auth/login",

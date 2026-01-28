@@ -1,22 +1,25 @@
 <script setup lang="ts">
-defineProps<{
-  title: string
-  subtitle: string
-  price: string
-  image: string
-}>()
+const props = withDefaults(
+  defineProps<{
+    title: string;
+    subtitle: string;
+    price: string;
+    image?: string;
+  }>(),
+  {
+    image: "https://picsum.photos/400/600?random=default",
+  },
+);
 </script>
 
 <template>
-  <div
-    class="relative w-40 h-60 rounded-lg overflow-hidden bg-neutral-200"
-  >
+  <div class="relative w-40 h-60 rounded-lg overflow-hidden bg-neutral-200">
     <!-- Background image -->
     <img
       :src="image"
       alt=""
       class="absolute inset-0 w-full h-full object-cover"
-    >
+    />
 
     <div
       class="absolute inset-0 bg-linear-to-t from-white/80 via-white/50 to-transparent"
