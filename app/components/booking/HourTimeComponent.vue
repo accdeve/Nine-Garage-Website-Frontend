@@ -1,10 +1,11 @@
 <script setup lang="ts">
 import { computed } from "vue";
-import { useTimeFormatter } from "~/composables/useTimeFormatter";
+import type { BookingAvailability } from "~/models/booking/booking";
 
 const props = withDefaults(
   defineProps<{
-    modelValue: number | null;
+    modelValue: string | null;
+    availability: BookingAvailability[];
     startHour?: number;
     endHour?: number;
   }>(),
@@ -15,38 +16,59 @@ const props = withDefaults(
 );
 
 const emit = defineEmits<{
-  (e: "update:modelValue", value: number): void;
+  (e: "update:modelValue", value: string): void;
 }>();
 
-const hours = computed(() => {
-  const result: number[] = [];
+// Generate default hours if availability is empty
+const displayHours = computed(() => {
+  if (props.availability.length > 0) {
+    return props.availability;
+  }
+
+  const result: BookingAvailability[] = [];
   for (let h = props.startHour; h <= props.endHour; h++) {
-    result.push(h);
+    const hourStr = `${h.toString().padStart(2, "0")}:00`;
+    result.push({ hour: hourStr, status: "available" });
   }
   return result;
 });
 
-const selectHour = (hour: number) => {
+const selectHour = (hour: string, status: string) => {
+  if (status !== "available") return;
   emit("update:modelValue", hour);
 };
-
-const { formatHour } = useTimeFormatter();
 </script>
 
 <template>
   <div class="grid grid-cols-2 grid-flow-row-dense gap-4">
     <div
-      v-for="hour in hours"
-      :key="hour"
-      class="cursor-pointer px-2 py-1 border rounded text-center text-sm w-16"
+      v-for="item in displayHours"
+      :key="item.hour"
+      class="px-2 py-1 border rounded text-center text-sm w-16 transition-all"
       :class="{
-        'border-green-300 text-green-300': modelValue === hour,
-        'border-gray-300': modelValue !== hour,
+        'border-primary text-primary bg-primary/5 cursor-pointer':
+          modelValue === item.hour,
+        'border-neutral-200 text-neutral-600 cursor-pointer hover:border-primary':
+          modelValue !== item.hour && item.status === 'available',
+        'border-red-500 text-red-500 opacity-70 cursor-not-allowed':
+          item.status === 'booked' || item.status === 'locked',
       }"
-      @click="selectHour(hour)"
+      @click="selectHour(item.hour, item.status)"
     >
-      <div class="text">    
-        {{ formatHour(hour) }}
+      <div>
+        {{ item.hour }}
+      </div>
+      <div
+        v-if="item.status === 'locked'"
+        class="text-[8px] uppercase font-bold"
+      >
+        Locked
+      </div>
+      <div
+        v-else-if="item.status === 'booked'"
+        class="text-[8px] uppercase font-bold"
+      >
+        Full
       </div>
     </div>
   </div>

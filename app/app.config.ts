@@ -11,11 +11,13 @@ export default defineAppConfig({
     input: {
       slots: {
         base: "!bg-neutral-50 !text-neutral-900",
+        input: "placeholder:!text-neutral-400",
       },
     },
     select: {
       slots: {
         base: "!bg-neutral-50 !text-neutral-900",
+        input: "placeholder:!text-neutral-400",
       },
     },
     selectMenu: {
