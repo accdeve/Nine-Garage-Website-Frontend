@@ -26,13 +26,14 @@ export async function apiRequest<T>(
   options: ApiRequestOptions = {},
 ): Promise<T> {
   const config = useRuntimeConfig();
+  const baseURL = config.public.apiBaseUrl as string;
 
   try {
     return (await $fetch<T>(url, {
-      baseURL: config.public.apiBaseUrl as string,
+      baseURL,
       method: options.method ?? "GET",
-      params: options.params as Record<string, never> | undefined,
-      body: options.body as BodyInit | Record<string, never> | null | undefined,
+      params: options.params,
+      body: options.body as any,
       headers: {
         Accept: "application/json",
         "Content-Type": "application/json",
