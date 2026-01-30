@@ -16,27 +16,47 @@ const breadcrumbItems = [
 
 const todayDate = today(getLocalTimeZone());
 
-// Sync date between Calendar (Object) and Store (String)
 const selectedDate = computed({
-  get: () => parseDate(bookingStore.formData.date),
+  get: () => parseDate(bookingStore.formData.booking_date),
   set: (val) => {
-    bookingStore.formData.date = val.toString();
+    bookingStore.formData.booking_date = val.toString();
   },
 });
 
-// Re-fetch availability when date changes
 watch(
-  () => bookingStore.formData.date,
+  () => bookingStore.formData.booking_date,
   () => {
     bookingStore.fetchAvailability();
   },
 );
 
-// Sync products from productStore to bookingStore
+const selectedProductNames = computed({
+  get: () => {
+    const selectedIds = bookingStore.formData.variant_items.map(
+      (v) => v.variant_id,
+    );
+    return productStore.products
+      .filter((p) => selectedIds.includes(p.id))
+      .map((p) => p.name);
+  },
+  set: (names: string[]) => {
+    const selectedProducts = productStore.products.filter((p) =>
+      names.includes(p.name),
+    );
+    bookingStore.formData.variant_items = selectedProducts.map((p) => ({
+      variant_id: p.id,
+      qty: 1, // Default qty
+    }));
+  },
+});
+
 watch(
   () => productStore.products,
   (newProducts) => {
-    bookingStore.setProducts(newProducts.map((p) => p.name));
+    // Update the options available in the store
+    bookingStore.setProducts(
+      newProducts.map((p) => ({ name: p.name, id: p.id })),
+    );
   },
   { immediate: true },
 );
@@ -54,27 +74,69 @@ onMounted(async () => {
     <div class="w-full max-w-md">
       <UBreadcrumb :items="breadcrumbItems" class="mb-6" />
 
-      <h2 class="text-2xl font-bold text-center mb-8">
+      <h2
+        v-if="!bookingStore.success"
+        class="text-2xl font-bold text-center mb-8"
+      >
         Form Booking Instalasi
       </h2>
 
+      <div
+        v-if="bookingStore.success"
+        class="text-center py-10 bg-neutral-900 rounded-xl border border-neutral-800 p-8 shadow-xl"
+      >
+        <div
+          class="w-20 h-20 bg-green-500/10 rounded-full flex items-center justify-center mx-auto mb-6"
+        >
+          <UIcon
+            name="i-lucide-check-circle"
+            class="w-12 h-12 text-green-500"
+          />
+        </div>
+        <h2 class="text-2xl font-bold mb-2 text-white">Booking Berhasil!</h2>
+        <p class="text-neutral-400 mb-8">
+          Pesanan Anda telah kami terima. Silakan simpan nomor tiket booking
+          Anda:
+          <span
+            class="block text-4xl font-mono font-bold text-primary mt-4 tracking-wider"
+          >
+            #{{ bookingStore.lastBooking?.booking_ticket }}
+          </span>
+        </p>
+
+        <div class="space-y-3">
+          <UButton block size="lg" color="primary" to="/">
+            Kembali ke Beranda
+          </UButton>
+          <UButton
+            block
+            variant="ghost"
+            color="neutral"
+            @click="bookingStore.success = false"
+          >
+            Buat Booking Lagi
+          </UButton>
+        </div>
+      </div>
+
       <UForm
+        v-if="!bookingStore.success"
         :state="bookingStore.formData"
         class="space-y-5"
         @submit="() => bookingStore.requestPreview()"
       >
-        <UFormField label="Nama" name="nama" required>
+        <UFormField label="Nama" name="customer_name" required>
           <UInput
-            v-model="bookingStore.formData.nama"
+            v-model="bookingStore.formData.customer_name"
             icon="i-lucide-user"
             class="w-full"
             placeholder="Masukkan nama lengkap"
           />
         </UFormField>
 
-        <UFormField label="Nomor WhatsApp" name="phone" required>
+        <UFormField label="Nomor WhatsApp" name="customer_phone" required>
           <UInput
-            v-model="bookingStore.formData.phone"
+            v-model="bookingStore.formData.customer_phone"
             icon="i-lucide-phone"
             class="w-full"
             placeholder="Contoh: 08123456789"
@@ -82,27 +144,27 @@ onMounted(async () => {
           />
         </UFormField>
 
-        <UFormField label="Nama Kendaraan" name="vehicle" required>
+        <UFormField label="Nama Kendaraan" name="vehicle_model" required>
           <UInput
-            v-model="bookingStore.formData.vehicle"
+            v-model="bookingStore.formData.vehicle_model"
             icon="i-lucide-car"
             class="w-full"
             placeholder="Contoh: Toyota Avanza"
           />
         </UFormField>
 
-        <UFormField label="Nomor Plat Kendaraan" name="plate" required>
+        <UFormField label="Nomor Plat Kendaraan" name="vehicle_plat" required>
           <UInput
-            v-model="bookingStore.formData.plate"
+            v-model="bookingStore.formData.vehicle_plat"
             icon="i-lucide-clipboard-list"
             class="w-full"
             placeholder="Contoh: B 1234 ABC"
           />
         </UFormField>
 
-        <UFormField label="Warna Kendaraan" name="vehicleColor" required>
+        <UFormField label="Warna Kendaraan" name="vehicle_color" required>
           <UInput
-            v-model="bookingStore.formData.vehicleColor"
+            v-model="bookingStore.formData.vehicle_color"
             icon="i-lucide-paintbrush"
             class="w-full"
             placeholder="Masukkan warna kendaraan"
@@ -123,7 +185,7 @@ onMounted(async () => {
               <HourTimeComponent
                 v-model="bookingStore.formData.hour"
                 :availability="bookingStore.availability"
-                :start-hour="8"
+                :start-hour="9"
                 :end-hour="17"
               />
             </div>
@@ -133,6 +195,7 @@ onMounted(async () => {
         <UFormField label="Cabang Bengkel" required>
           <USelectMenu
             v-model="bookingStore.formData.branch"
+            placeholder="Pilih Product"
             :items="bookingStore.branches"
             class="w-full"
           />
@@ -140,7 +203,7 @@ onMounted(async () => {
 
         <UFormField label="Nama Product" required>
           <USelectMenu
-            v-model="bookingStore.formData.products"
+            v-model="selectedProductNames"
             placeholder="Pilih Product"
             multiple
             :items="bookingStore.productOptions"
@@ -153,6 +216,14 @@ onMounted(async () => {
           <USelectMenu
             v-model="bookingStore.formData.source"
             :items="bookingStore.sources"
+            class="w-full"
+          />
+        </UFormField>
+
+        <UFormField label="Catatan Tambahan (Opsional)" name="notes">
+          <UTextarea
+            v-model="bookingStore.formData.notes"
+            placeholder="Tambahkan catatan jika ada (contoh: Keluhan pada rem, ganti oli sekalian, dll)"
             class="w-full"
           />
         </UFormField>

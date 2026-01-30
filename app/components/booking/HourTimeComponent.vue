@@ -19,7 +19,6 @@ const emit = defineEmits<{
   (e: "update:modelValue", value: string): void;
 }>();
 
-// Generate default hours if availability is empty
 const displayHours = computed(() => {
   if (props.availability.length > 0) {
     return props.availability;

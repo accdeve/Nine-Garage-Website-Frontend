@@ -1,24 +1,32 @@
 import { defineStore } from "pinia";
 import type { BookingState } from "./types";
 import { bookingService } from "~/services/booking/booking.service";
+import { workshopService } from "~/services/workshop/workshop.service";
+import { ApiError } from "~/utils/api";
 import { today, getLocalTimeZone } from "@internationalized/date";
 
 export const useBookingStore = defineStore("booking", {
   state: (): BookingState => ({
     formData: {
-      nama: "",
-      phone: "",
-      vehicle: "",
-      plate: "",
-      vehicleColor: "",
-      date: today(getLocalTimeZone()).toString(),
+      workshop_id: 0,
+      customer_name: "",
+      customer_phone: "",
+      vehicle_model: "",
+      vehicle_plat: "",
+      vehicle_color: "",
+      booking_date: today(getLocalTimeZone()).toString(),
       hour: null,
-      branch: "Jelambar",
-      products: [],
-      source: "Online",
+      branch: "",
+      notes: "",
+      variant_items: [],
+      package_items: [],
+      service_items: [],
+      source: "Website",
     },
-    branches: ["Jl Arcadia Daan Mogot", "Jelambar"],
-    sources: ["Online", "Workshop"],
+    branches: [],
+    workshops: [],
+    sources: ["Online", "Offline", "Website"],
+
     productOptions: [],
     availability: [],
     lastBooking: null,
@@ -35,14 +43,16 @@ export const useBookingStore = defineStore("booking", {
     isFormComplete: (state) => {
       const { formData } = state;
       return !!(
-        formData.nama &&
-        formData.phone &&
-        formData.vehicle &&
-        formData.plate &&
-        formData.vehicleColor &&
+        formData.customer_name &&
+        formData.customer_phone &&
+        formData.vehicle_model &&
+        formData.vehicle_plat &&
+        formData.vehicle_color &&
         formData.hour !== null &&
         formData.branch &&
-        formData.products.length > 0 &&
+        (formData.variant_items.length > 0 ||
+          formData.package_items.length > 0 ||
+          formData.service_items.length > 0) &&
         formData.source
       );
     },
@@ -63,30 +73,59 @@ export const useBookingStore = defineStore("booking", {
       }
     },
 
-    setProducts(productNames: string[]) {
-      this.productOptions = productNames;
+    setProducts(products: { name: string; id: number }[]) {
+      this.productOptions = products.map((p) => p.name);
     },
 
     async fetchInitialData() {
       this.loading = true;
       try {
+        await this.fetchWorkshops();
         await this.fetchAvailability();
-      } catch (err) {
+      } catch (err: unknown) {
         console.error("Failed to fetch booking initial data", err);
       } finally {
         this.loading = false;
       }
     },
 
+    async fetchWorkshops() {
+      try {
+        const response = await workshopService.getWorkshops();
+        this.workshops = response.data;
+        this.branches = response.data.map((w) => w.name);
+
+        // Set default branch if not set
+        if (this.branches.length > 0 && !this.formData.branch) {
+          this.formData.branch = this.branches[0] || "";
+        }
+
+        const workshop = this.workshops.find(
+          (w) => w.name === this.formData.branch,
+        );
+        if (workshop) {
+          this.formData.workshop_id = workshop.id;
+        }
+      } catch (err: unknown) {
+        console.error("Failed to fetch workshops", err);
+      }
+    },
+
     async fetchAvailability() {
-      // Using default workshop_id = 1 for now
+      const workshop = this.workshops.find(
+        (w) => w.name === this.formData.branch,
+      );
+
+      // Default to 1 if not found, or handle error
+      const workshopId = workshop ? workshop.id : 1;
+
       try {
         const response = await bookingService.getAvailability(
-          1,
-          this.formData.date,
+          workshopId,
+          this.formData.booking_date,
         );
         this.availability = response.data;
-      } catch (err) {
+      } catch (err: unknown) {
         console.error("Failed to fetch availability", err);
       }
     },
@@ -97,23 +136,31 @@ export const useBookingStore = defineStore("booking", {
       this.submitting = true;
       this.error = null;
 
+      const workshop = this.workshops.find(
+        (w) => w.name === this.formData.branch,
+      );
+      if (workshop) {
+        this.formData.workshop_id = workshop.id;
+      }
+
       try {
         await bookingService.previewBooking({
-          workshop_id: 1, // Default mapping
-          date: this.formData.date,
+          workshop_id: this.formData.workshop_id,
+          booking_date: this.formData.booking_date,
           hour: this.formData.hour,
-          phone: this.formData.phone,
+          customer_phone: this.formData.customer_phone,
         });
 
         this.openPreview = true;
         this.startCountdown(180); // 3 minutes
-      } catch (err: any) {
-        if (err.statusCode === 409) {
+      } catch (err: unknown) {
+        if (err instanceof ApiError && err.statusCode === 409) {
           this.error =
             "Slot waktu ini sudah dipesan atau sedang dikunci orang lain. Silakan pilih waktu lain.";
         } else {
           this.error =
-            err.message || "Gagal mengunci slot waktu. Silakan coba lagi.";
+            (err instanceof Error ? err.message : "") ||
+            "Gagal mengunci slot waktu. Silakan coba lagi.";
         }
         // Refresh availability to show the locked status
         this.fetchAvailability();
@@ -148,6 +195,13 @@ export const useBookingStore = defineStore("booking", {
       this.error = null;
       this.success = false;
 
+      const workshop = this.workshops.find(
+        (w) => w.name === this.formData.branch,
+      );
+      if (workshop) {
+        this.formData.workshop_id = workshop.id;
+      }
+
       try {
         const response = await bookingService.submitBooking(this.formData);
         this.lastBooking = response.data;
@@ -156,7 +210,7 @@ export const useBookingStore = defineStore("booking", {
         this.stopCountdown();
         this.resetForm();
         return true;
-      } catch (err) {
+      } catch (err: unknown) {
         this.error =
           err instanceof Error
             ? err.message
@@ -169,17 +223,29 @@ export const useBookingStore = defineStore("booking", {
 
     resetForm() {
       this.formData = {
-        nama: "",
-        phone: "",
-        vehicle: "",
-        plate: "",
-        vehicleColor: "",
-        date: today(getLocalTimeZone()).toString(),
+        workshop_id: 0,
+        customer_name: "",
+        customer_phone: "",
+        vehicle_model: "",
+        vehicle_plat: "",
+        vehicle_color: "",
+        booking_date: today(getLocalTimeZone()).toString(),
         hour: null,
-        branch: "Jelambar",
-        products: [],
-        source: "Online",
+        branch: this.branches[0] || "",
+        notes: "",
+        variant_items: [],
+        package_items: [],
+        service_items: [],
+        source: "website",
       };
+
+      const workshop = this.workshops.find(
+        (w) => w.name === this.formData.branch,
+      );
+      if (workshop) {
+        this.formData.workshop_id = workshop.id;
+      }
+
       this.error = null;
       this.success = false;
       this.fetchAvailability();

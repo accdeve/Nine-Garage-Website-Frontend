@@ -1,12 +1,14 @@
 import type {
-  BookingFormData,
   Booking,
   BookingAvailability,
+  BookingFormData,
 } from "~/models/booking/booking";
+import type { Workshop } from "~/models/workshop/workshop";
 
 export interface BookingState {
   formData: BookingFormData;
   branches: string[];
+  workshops: Workshop[];
   sources: string[];
   productOptions: string[];
   availability: BookingAvailability[];
@@ -17,5 +19,5 @@ export interface BookingState {
   success: boolean;
   openPreview: boolean;
   timeLeft: number;
-  timerInterval: any | null;
+  timerInterval: ReturnType<typeof setInterval> | null;
 }

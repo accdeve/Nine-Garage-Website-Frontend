@@ -21,7 +21,7 @@ export const bookingService = {
       "/bookings/availability",
       {
         workshop_id: workshopId,
-        date,
+        booking_date: date,
       },
     );
   },
