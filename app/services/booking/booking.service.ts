@@ -30,6 +30,10 @@ export const bookingService = {
     return apiPost<ApiResponse<null>>("/bookings/preview", data);
   },
 
+  cancelPreviewBooking(data: BookingPreviewRequest) {
+    return apiPost<ApiResponse<null>>("/bookings/cancel-preview", data);
+  },
+
   submitBooking(data: BookingFormData) {
     return apiPost<ApiResponse<Booking>>("/bookings", data);
   },

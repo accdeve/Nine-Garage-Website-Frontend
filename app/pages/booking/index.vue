@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, onMounted, watch } from "vue";
+import { computed, onMounted, onUnmounted, watch, ref } from "vue";
 import { parseDate, today, getLocalTimeZone } from "@internationalized/date";
 import HourTimeComponent from "~/components/booking/HourTimeComponent.vue";
 import PreviewInputBooking from "./PreviewInputBooking.vue";
@@ -8,6 +8,18 @@ import { useProductStore } from "~/stores/product";
 
 const bookingStore = useBookingStore();
 const productStore = useProductStore();
+const toast = useToast();
+
+const agreedToTerms = ref(false);
+
+watch(
+  () => bookingStore.openPreview,
+  (val) => {
+    if (val) {
+      agreedToTerms.value = false;
+    }
+  },
+);
 
 const breadcrumbItems = [
   { label: "Home", to: "/" },
@@ -23,10 +35,24 @@ const selectedDate = computed({
   },
 });
 
+const selectedBranch = computed({
+  get: () => bookingStore.formData.branch,
+  set: (val: string) => {
+    bookingStore.formData.branch = val;
+    const workshop = bookingStore.workshops.find((w) => w.name === val);
+    if (workshop) {
+      bookingStore.formData.workshop_id = workshop.id;
+    }
+    // Reset hour selection when branch changes
+    bookingStore.formData.hour = null;
+  },
+});
+
 watch(
-  () => bookingStore.formData.booking_date,
+  () => [bookingStore.formData.booking_date, bookingStore.formData.workshop_id],
   () => {
     bookingStore.fetchAvailability();
+    bookingStore.subscribeToUpdates();
   },
 );
 
@@ -45,7 +71,7 @@ const selectedProductNames = computed({
     );
     bookingStore.formData.variant_items = selectedProducts.map((p) => ({
       variant_id: p.id,
-      qty: 1, // Default qty
+      qty: 1,
     }));
   },
 });
@@ -53,7 +79,6 @@ const selectedProductNames = computed({
 watch(
   () => productStore.products,
   (newProducts) => {
-    // Update the options available in the store
     bookingStore.setProducts(
       newProducts.map((p) => ({ name: p.name, id: p.id })),
     );
@@ -61,11 +86,46 @@ watch(
   { immediate: true },
 );
 
+const handleHourSelected = () => {
+  bookingStore.error = null;
+};
+
+const handleFinalSubmit = async () => {
+  const success = await bookingStore.submitBooking();
+  if (success) {
+    toast.add({
+      title: "Booking Berhasil",
+      description: "Data booking dikirim lewat whatsapp.",
+      color: "success",
+    });
+  }
+};
+
+const handleBeforeUnload = (event: BeforeUnloadEvent) => {
+  if (bookingStore.openPreview) {
+    bookingStore.cancelPreview();
+    // Some browsers require setting a return value
+    event.preventDefault();
+    event.returnValue = "";
+  }
+};
+
 onMounted(async () => {
-  bookingStore.fetchInitialData();
+  window.addEventListener("beforeunload", handleBeforeUnload);
+  await bookingStore.fetchInitialData();
+  bookingStore.subscribeToUpdates();
+
   if (productStore.products.length === 0) {
     await productStore.fetchProducts();
   }
+});
+
+onUnmounted(() => {
+  window.removeEventListener("beforeunload", handleBeforeUnload);
+  if (bookingStore.openPreview) {
+    bookingStore.cancelPreview();
+  }
+  bookingStore.unsubscribeFromUpdates();
 });
 </script>
 
@@ -171,11 +231,22 @@ onMounted(async () => {
           />
         </UFormField>
 
+        <UFormField label="Cabang Bengkel" required>
+          <USelectMenu
+            v-model="selectedBranch"
+            placeholder="Pilih Cabang"
+            :items="bookingStore.branches"
+            class="w-full"
+          />
+        </UFormField>
+
         <div class="flex gap-4 items-start flex-wrap sm:flex-nowrap">
           <UFormField label="Tanggal Booking" required class="w-full sm:w-auto">
             <UCalendar
               v-model="selectedDate"
               size="sm"
+              variant="soft"
+              color="primary"
               :min-value="todayDate"
             />
           </UFormField>
@@ -187,19 +258,11 @@ onMounted(async () => {
                 :availability="bookingStore.availability"
                 :start-hour="9"
                 :end-hour="17"
+                @update:model-value="handleHourSelected"
               />
             </div>
           </UFormField>
         </div>
-
-        <UFormField label="Cabang Bengkel" required>
-          <USelectMenu
-            v-model="bookingStore.formData.branch"
-            placeholder="Pilih Product"
-            :items="bookingStore.branches"
-            class="w-full"
-          />
-        </UFormField>
 
         <UFormField label="Nama Product" required>
           <USelectMenu
@@ -216,14 +279,6 @@ onMounted(async () => {
           <USelectMenu
             v-model="bookingStore.formData.source"
             :items="bookingStore.sources"
-            class="w-full"
-          />
-        </UFormField>
-
-        <UFormField label="Catatan Tambahan (Opsional)" name="notes">
-          <UTextarea
-            v-model="bookingStore.formData.notes"
-            placeholder="Tambahkan catatan jika ada (contoh: Keluhan pada rem, ganti oli sekalian, dll)"
             class="w-full"
           />
         </UFormField>
@@ -258,41 +313,53 @@ onMounted(async () => {
 
               <PreviewInputBooking :data="bookingStore.formData" />
 
-              <div
-                v-if="bookingStore.error"
-                class="mt-4 p-3 bg-red-50 text-red-600 rounded-md text-sm"
-              >
-                {{ bookingStore.error }}
-              </div>
+              <div class="mt-6 space-y-4">
+                <div class="flex items-start gap-3">
+                  <UCheckbox
+                    v-model="agreedToTerms"
+                    id="terms"
+                    class="mt-0.5"
+                  />
+                  <label
+                    for="terms"
+                    class="text-xs text-neutral-400 cursor-pointer select-none"
+                  >
+                    Saya menyetujui syarat dan ketentuan layanan kami.
+                  </label>
+                </div>
 
-              <div class="mt-6 flex gap-3">
-                <UButton
-                  variant="ghost"
-                  color="neutral"
-                  class="flex-1 justify-center"
-                  @click="() => bookingStore.togglePreview(false)"
+                <div
+                  v-if="bookingStore.error"
+                  class="p-3 bg-red-50 text-red-600 rounded-md text-sm"
                 >
-                  Kembali
-                </UButton>
-                <UButton
-                  color="primary"
-                  class="flex-1 justify-center"
-                  :loading="bookingStore.submitting"
-                  @click="
-                    () => {
-                      bookingStore.submitBooking();
-                    }
-                  "
-                >
-                  Konfirmasi & Kirim
-                </UButton>
+                  {{ bookingStore.error }}
+                </div>
+
+                <div class="flex gap-3">
+                  <UButton
+                    variant="ghost"
+                    color="neutral"
+                    class="flex-1 justify-center"
+                    @click="() => bookingStore.cancelPreview()"
+                  >
+                    Batal
+                  </UButton>
+                  <UButton
+                    color="primary"
+                    class="flex-1 justify-center"
+                    :loading="bookingStore.submitting"
+                    :disabled="!agreedToTerms"
+                    @click="handleFinalSubmit"
+                  >
+                    Konfirmasi & Kirim
+                  </UButton>
+                </div>
               </div>
             </div>
           </template>
         </UDrawer>
       </UForm>
 
-      <!-- General Error Message -->
       <div
         v-if="bookingStore.error && !bookingStore.openPreview"
         class="mt-4 p-3 bg-red-50 text-red-600 rounded-md text-center text-sm"

@@ -44,5 +44,10 @@ export default defineAppConfig({
       warning: "warning",
       danger: "danger",
     },
+    calendar: {
+      slots: {
+        header: "[&_button]:text-primary-500",
+      },
+    },
   },
 });

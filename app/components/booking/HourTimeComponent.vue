@@ -45,12 +45,14 @@ const selectHour = (hour: string, status: string) => {
       :key="item.hour"
       class="px-2 py-1 border rounded text-center text-sm w-16 transition-all"
       :class="{
-        'border-primary text-primary bg-primary/5 cursor-pointer':
-          modelValue === item.hour,
-        'border-neutral-200 text-neutral-600 cursor-pointer hover:border-primary':
+        'border-primary-500 bg-primary-50 text-primary-700':
+          modelValue === item.hour && item.status === 'available',
+        'border-green-200 bg-green-50 text-green-700 cursor-pointer hover:border-green-500':
           modelValue !== item.hour && item.status === 'available',
-        'border-red-500 text-red-500 opacity-70 cursor-not-allowed':
-          item.status === 'booked' || item.status === 'locked',
+        'border-yellow-400 bg-yellow-50 text-yellow-700 cursor-not-allowed':
+          item.status === 'locked',
+        'border-red-400 bg-red-50 text-red-700 cursor-not-allowed':
+          item.status === 'booked',
       }"
       @click="selectHour(item.hour, item.status)"
     >
@@ -68,6 +70,9 @@ const selectHour = (hour: string, status: string) => {
         class="text-[8px] uppercase font-bold"
       >
         Full
+      </div>
+      <div v-else class="text-[8px] uppercase font-bold opacity-50">
+        Available
       </div>
     </div>
   </div>

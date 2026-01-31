@@ -77,7 +77,7 @@ export const useProductStore = defineStore("product", {
       }
     },
 
-    setProductsResponse(data: { data?: any[]; meta?: any } | null) {
+    setProductsResponse(data: { data?: never[]; meta?: never } | null) {
       if (data && data.data) {
         this.products = data.data;
         if (data.meta) {

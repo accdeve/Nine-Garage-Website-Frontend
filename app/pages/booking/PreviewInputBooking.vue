@@ -1,9 +1,22 @@
 <script setup lang="ts">
+import { computed } from "vue";
 import type { BookingFormData } from "~/models/booking/booking";
+import { useProductStore } from "~/stores/product";
 
-defineProps<{
+const props = defineProps<{
   data: BookingFormData;
 }>();
+
+const productStore = useProductStore();
+
+const productNames = computed(() => {
+  const ids = props.data.variant_items.map((v) => v.variant_id);
+  const names = productStore.products
+    .filter((p) => ids.includes(p.id))
+    .map((p) => p.name);
+
+  return names.length > 0 ? names.join(", ") : "Tidak ada produk";
+});
 </script>
 
 <template>
@@ -41,7 +54,7 @@ defineProps<{
 
       <div class="font-medium text-neutral-500">Produk</div>
       <div class="text-white">
-        {{ data.variant_items.length }} Item(s) Selected
+        {{ productNames }}
       </div>
 
       <div class="font-medium text-neutral-500">Asal</div>
