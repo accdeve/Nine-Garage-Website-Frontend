@@ -24,6 +24,7 @@ export interface BookingFormData {
   workshop_id: number;
   customer_name: string;
   customer_phone: string;
+  vehicle_type: "car" | "motorcycle" | "";
   vehicle_model: string;
   vehicle_plat: string;
   vehicle_color: string;
@@ -66,6 +67,7 @@ export interface Booking {
   workshop_id: number;
   customer_name: string;
   customer_phone: string;
+  vehicle_type?: "car" | "motorcycle" | "";
   vehicle_plat: string;
   vehicle_model: string;
   vehicle_color: string;

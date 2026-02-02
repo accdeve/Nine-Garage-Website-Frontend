@@ -6,6 +6,7 @@ export const createState = (): BookingState => ({
     workshop_id: 0,
     customer_name: "",
     customer_phone: "",
+    vehicle_type: "",
     vehicle_model: "",
     vehicle_plat: "",
     vehicle_color: "",
@@ -22,9 +23,10 @@ export const createState = (): BookingState => ({
   workshops: [],
   sources: ["Online", "Offline", "Website"],
 
-  productOptions: [],
+  serviceOptions: [],
   availability: [],
   lastBooking: null,
+  originalBooking: null,
   loading: false,
   submitting: false,
   error: null,
@@ -33,4 +35,5 @@ export const createState = (): BookingState => ({
   timeLeft: 0,
   timerInterval: null,
   sseInstance: null,
+  editingId: null,
 });

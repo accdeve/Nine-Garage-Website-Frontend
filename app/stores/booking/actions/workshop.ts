@@ -37,7 +37,7 @@ export const workshopActions = {
     }
   },
 
-  setProducts(this: BookingStore, products: { name: string; id: number }[]) {
-    this.productOptions = products.map((p) => p.name);
+  setServices(this: BookingStore, services: { name: string; id: number }[]) {
+    this.serviceOptions = services.map((s) => s.name);
   },
 };

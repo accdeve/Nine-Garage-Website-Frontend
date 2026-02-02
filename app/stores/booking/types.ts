@@ -10,9 +10,10 @@ export interface BookingState {
   branches: string[];
   workshops: Workshop[];
   sources: string[];
-  productOptions: string[];
+  serviceOptions: string[];
   availability: BookingAvailability[];
   lastBooking: Booking | null;
+  originalBooking: Booking | null;
   loading: boolean;
   submitting: boolean;
   error: string | null;
@@ -21,6 +22,7 @@ export interface BookingState {
   timeLeft: number;
   timerInterval: ReturnType<typeof setInterval> | null;
   sseInstance: EventSource | null;
+  editingId: number | null;
 }
 
 export interface BookingGetters {
@@ -30,7 +32,7 @@ export interface BookingGetters {
 
 export interface BookingActions {
   togglePreview(val: boolean): void;
-  setProducts(products: { name: string; id: number }[]): void;
+  setServices(services: { name: string; id: number }[]): void;
   fetchInitialData(): Promise<void>;
   fetchWorkshops(): Promise<void>;
   fetchAvailability(): Promise<void>;
@@ -39,6 +41,7 @@ export interface BookingActions {
   startCountdown(seconds: number): void;
   stopCountdown(): void;
   submitBooking(): Promise<boolean>;
+  checkBooking(ticket: string): Promise<boolean>;
   resetForm(): void;
   subscribeToUpdates(): void;
   unsubscribeFromUpdates(): void;

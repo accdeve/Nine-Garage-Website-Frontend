@@ -1,21 +1,21 @@
 <script setup lang="ts">
 import { computed } from "vue";
 import type { BookingFormData } from "~/models/booking/booking";
-import { useProductStore } from "~/stores/product";
+import { useServiceStore } from "~/stores/service";
 
 const props = defineProps<{
   data: BookingFormData;
 }>();
 
-const productStore = useProductStore();
+const serviceStore = useServiceStore();
 
-const productNames = computed(() => {
-  const ids = props.data.variant_items.map((v) => v.variant_id);
-  const names = productStore.products
-    .filter((p) => ids.includes(p.id))
-    .map((p) => p.name);
+const serviceNames = computed(() => {
+  const ids = props.data.service_items.map((s) => s.service_id);
+  const names = serviceStore.services
+    .filter((s) => ids.includes(s.id))
+    .map((s) => s.name);
 
-  return names.length > 0 ? names.join(", ") : "Tidak ada produk";
+  return names.length > 0 ? names.join(", ") : "Tidak ada layanan";
 });
 </script>
 
@@ -52,9 +52,9 @@ const productNames = computed(() => {
       <div class="font-medium text-neutral-500">Cabang</div>
       <div class="text-white">{{ data.branch }}</div>
 
-      <div class="font-medium text-neutral-500">Produk</div>
+      <div class="font-medium text-neutral-500">Layanan</div>
       <div class="text-white">
-        {{ productNames }}
+        {{ serviceNames }}
       </div>
 
       <div class="font-medium text-neutral-500">Asal</div>

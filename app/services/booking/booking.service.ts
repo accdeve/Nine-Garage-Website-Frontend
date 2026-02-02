@@ -1,4 +1,4 @@
-import { apiGet, apiPost } from "~/utils/api";
+import { apiGet, apiPost, apiPatch } from "~/utils/api";
 import type { ApiResponse } from "~/models/api";
 import type {
   BookingFormData,
@@ -24,6 +24,14 @@ export const bookingService = {
         booking_date: date,
       },
     );
+  },
+
+  getBooking(bookingTicket: string) {
+    return apiGet<ApiResponse<Booking>>(`/bookings/${bookingTicket}`);
+  },
+
+  updateBooking(id: number, data: BookingFormData) {
+    return apiPatch<ApiResponse<Booking>>(`/bookings/${id}`, data);
   },
 
   previewBooking(data: BookingPreviewRequest) {

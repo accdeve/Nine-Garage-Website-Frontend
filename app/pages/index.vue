@@ -79,6 +79,7 @@ watch(
     <hr class="ml-5 mr-5 border-t-2 border-neutral-300 mt-5 mb-5" >
     <HomeFindUs />
     <HomeWhyUs />
+    <br>
     <HomePartner />
     <hr class="ml-5 mr-5 border-t-2 border-neutral-300 mt-15 mb-5" >
     <HomeComments />

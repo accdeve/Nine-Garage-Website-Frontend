@@ -41,7 +41,7 @@ const props = withDefaults(
         size="xs"
         class="mt-2 w-fit text-black"
       >
-        Pasang
+        List Product
       </UButton>
     </div>
   </div>

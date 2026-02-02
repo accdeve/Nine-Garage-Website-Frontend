@@ -6,6 +6,7 @@ export const getters = {
     return !!(
       formData.customer_name &&
       formData.customer_phone &&
+      formData.vehicle_type &&
       formData.vehicle_model &&
       formData.vehicle_plat &&
       formData.vehicle_color &&

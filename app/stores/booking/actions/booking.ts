@@ -94,7 +94,16 @@ export const bookingActions = {
     }
 
     try {
-      const response = await bookingService.submitBooking(this.formData);
+      let response;
+      if (this.editingId) {
+        response = await bookingService.updateBooking(
+          this.editingId,
+          this.formData,
+        );
+      } else {
+        response = await bookingService.submitBooking(this.formData);
+      }
+
       this.lastBooking = response.data;
       this.success = true;
       this.openPreview = false;
@@ -105,18 +114,77 @@ export const bookingActions = {
       this.error =
         err instanceof Error
           ? err.message
-          : "Gagal membuat booking. Silakan coba lagi.";
+          : "Gagal memproses booking. Silakan coba lagi.";
       return false;
     } finally {
       this.submitting = false;
     }
   },
 
+  async checkBooking(this: BookingStore, ticket: string) {
+    this.loading = true;
+    this.error = null;
+    try {
+      const response = await bookingService.getBooking(ticket);
+      const booking = response.data;
+      if (!booking) {
+        throw new Error("Booking not found");
+      }
+
+      // Populate form data
+      const workshop = this.workshops.find((w) => w.id === booking.workshop_id);
+
+      this.editingId = booking.id;
+      this.originalBooking = booking;
+
+      this.formData = {
+        workshop_id: booking.workshop_id,
+        customer_name: booking.customer_name,
+        customer_phone: booking.customer_phone,
+        vehicle_type: (booking.vehicle_type as "car" | "motorcycle" | "") || "",
+        vehicle_model: booking.vehicle_model,
+        vehicle_plat: booking.vehicle_plat,
+        vehicle_color: booking.vehicle_color,
+        booking_date: booking.booking_date.split("T")[0],
+        hour: booking.hour ? booking.hour.slice(0, 5) : null,
+        branch: workshop ? workshop.name : "",
+        notes: booking.notes || "",
+        variant_items: booking.variant_items
+          ? booking.variant_items.map((v) => ({
+              variant_id: v.variant_id,
+              qty: v.qty,
+            }))
+          : [],
+        package_items: booking.package_items
+          ? booking.package_items.map((p) => ({ package_id: p.package_id }))
+          : [],
+        service_items: booking.service_items
+          ? booking.service_items.map((s) => ({ service_id: s.service_id }))
+          : [],
+        source: booking.source || "Website",
+      };
+
+      // Trigger availability check for the loaded date/workshop
+      this.fetchAvailability();
+
+      return true;
+    } catch (err: unknown) {
+      console.error("Failed to check booking", err);
+      this.error = "Kode booking tidak ditemukan atau terjadi kesalahan.";
+      return false;
+    } finally {
+      this.loading = false;
+    }
+  },
+
   resetForm(this: BookingStore) {
+    this.editingId = null;
+    this.originalBooking = null;
     this.formData = {
       workshop_id: 0,
       customer_name: "",
       customer_phone: "",
+      vehicle_type: "",
       vehicle_model: "",
       vehicle_plat: "",
       vehicle_color: "",
