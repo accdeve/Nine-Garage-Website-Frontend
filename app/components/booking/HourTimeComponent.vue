@@ -57,10 +57,11 @@ const selectHour = (hour: string, status: string) => {
           modelValue !== item.hour &&
           item.hour !== originalHour &&
           item.status === 'available',
-        'border-yellow-400 bg-yellow-50 text-yellow-700 cursor-not-allowed':
-          item.status === 'locked' && item.hour !== originalHour,
-        'border-red-400 bg-red-50 text-red-700 cursor-not-allowed':
-          item.status === 'booked' && item.hour !== originalHour,
+        'border-gray-200 bg-gray-50 text-gray-400 cursor-not-allowed':
+          (item.status === 'locked' ||
+            item.status === 'booked' ||
+            item.remaining_capacity === 0) &&
+          item.hour !== originalHour,
       }"
       @click="selectHour(item.hour, item.status)"
     >
@@ -80,13 +81,11 @@ const selectHour = (hour: string, status: string) => {
         {{ originalHour ? "Ganti" : "Dipilih" }}
       </div>
       <div
-        v-else-if="item.status === 'locked'"
-        class="text-[8px] uppercase font-bold"
-      >
-        Locked
-      </div>
-      <div
-        v-else-if="item.status === 'booked'"
+        v-else-if="
+          item.status === 'locked' ||
+          item.status === 'booked' ||
+          item.remaining_capacity === 0
+        "
         class="text-[8px] uppercase font-bold"
       >
         Full

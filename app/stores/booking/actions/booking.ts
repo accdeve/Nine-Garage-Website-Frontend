@@ -145,8 +145,11 @@ export const bookingActions = {
         vehicle_model: booking.vehicle_model,
         vehicle_plat: booking.vehicle_plat,
         vehicle_color: booking.vehicle_color,
-        booking_date: booking.booking_date.split("T")[0],
+        booking_date: booking.booking_date
+          ? booking.booking_date.split("T")[0] || ""
+          : "",
         hour: booking.hour ? booking.hour.slice(0, 5) : null,
+
         branch: workshop ? workshop.name : "",
         notes: booking.notes || "",
         variant_items: booking.variant_items

@@ -11,6 +11,7 @@ export type BookingStatus =
 export interface BookingAvailability {
   hour: string;
   status: AvailabilityStatus;
+  remaining_capacity: number;
 }
 
 export interface BookingPreviewRequest {
@@ -32,7 +33,7 @@ export interface BookingFormData {
   hour: string | null;
   branch: string;
   source: string;
-  notes: string;
+  notes?: string;
   variant_items: { variant_id: number; qty: number }[];
   package_items: { package_id: number }[];
   service_items: { service_id: number }[];

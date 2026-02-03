@@ -1,4 +1,8 @@
 import type { BookingStore } from "../types";
+import { useRuntimeConfig } from "#imports";
+
+let refreshTimeout: ReturnType<typeof setTimeout> | null = null;
+let reconnectTimeout: ReturnType<typeof setTimeout> | null = null;
 
 export const sseActions = {
   subscribeToUpdates(this: BookingStore) {
@@ -6,36 +10,90 @@ export const sseActions = {
     this.unsubscribeFromUpdates();
 
     const config = useRuntimeConfig();
+
+    // Use the latest workshop_id from state
     const workshopId = this.formData.workshop_id;
     const bookingDate = this.formData.booking_date;
 
-    // Use default if workshopId is not set yet
-    const targetId = workshopId || 1;
+    // Don't subscribe if we don't have basic info
+    if (!workshopId || !bookingDate) {
+      console.warn(
+        "[SSE] Skipping subscription: workshopId or bookingDate missing",
+        { workshopId, bookingDate },
+      );
+      return;
+    }
 
-    const url = `${config.public.apiBaseUrl}/bookings/stream?workshop_id=${targetId}&date=${bookingDate}`;
+    const apiBase = config.public.apiBaseUrl || "";
+    const apiBaseClean = apiBase.endsWith("/") ? apiBase.slice(0, -1) : apiBase;
 
-    console.log(`[SSE] Connecting to: ${url}`);
+    // Construct URL - Menggunakan /stream sesuai informasi backend terbaru
+    const url = `${apiBaseClean}/bookings/updates?workshop_id=${workshopId}&date=${bookingDate}`;
 
-    this.sseInstance = new EventSource(url);
+    console.log(`[SSE] Attempting connection:`, {
+      url,
+      workshopId,
+      bookingDate,
+    });
 
-    this.sseInstance.onmessage = (event) => {
-      try {
-        const update = JSON.parse(event.data);
-        console.log(`[SSE] Received update:`, update);
+    try {
+      this.sseInstance = new EventSource(url);
 
-        const slot = this.availability.find((s) => s.hour === update.hour);
-        if (slot) {
-          slot.status = update.status;
+      this.sseInstance.onopen = () => {
+        console.log(
+          `[SSE] Connected to /stream for workshop ${workshopId} on ${bookingDate}`,
+        );
+        // Immediately fetch availability on connect to ensure we are up to date
+        this.fetchAvailability();
+      };
+
+      this.sseInstance.onmessage = (event) => {
+        try {
+          const payload = JSON.parse(event.data);
+          console.log(`[SSE] Message received:`, payload);
+
+          // Flexible filtering: handle both 'date' and 'booking_date'
+          const updateDate = payload.booking_date || payload.date;
+          const isDifferentWorkshop =
+            payload.workshop_id && payload.workshop_id != workshopId;
+          const isDifferentDate = updateDate && updateDate !== bookingDate;
+
+          if (isDifferentWorkshop || isDifferentDate) {
+            console.log("[SSE] Message ignored due to mismatch", {
+              payload,
+              current: { workshopId, bookingDate },
+            });
+            return;
+          }
+
+          // Any message on this stream should trigger a refresh to be safe
+          console.log(
+            `[SSE] Triggering refresh due to event: ${payload.status || "message"}`,
+          );
+
+          if (refreshTimeout) clearTimeout(refreshTimeout);
+          refreshTimeout = setTimeout(() => {
+            this.fetchAvailability();
+          }, 250);
+        } catch (err) {
+          console.error("[SSE] Error parsing event data:", err);
+          // If we can't parse it but got a message, maybe still refresh?
+          this.fetchAvailability();
         }
-      } catch (err) {
-        console.error("[SSE] Error parsing event data", err);
-      }
-    };
+      };
 
-    this.sseInstance.onerror = (err) => {
-      console.error("[SSE] Connection failed", err);
-      this.unsubscribeFromUpdates();
-    };
+      this.sseInstance.onerror = (err) => {
+        console.warn("[SSE] Connection error. Reconnecting in 2s...", err);
+        this.unsubscribeFromUpdates();
+
+        if (reconnectTimeout) clearTimeout(reconnectTimeout);
+        reconnectTimeout = setTimeout(() => {
+          this.subscribeToUpdates();
+        }, 2000);
+      };
+    } catch (err) {
+      console.error("[SSE] Failed to initialize EventSource:", err);
+    }
   },
 
   unsubscribeFromUpdates(this: BookingStore) {
@@ -43,6 +101,16 @@ export const sseActions = {
       console.log("[SSE] Closing connection");
       this.sseInstance.close();
       this.sseInstance = null;
+    }
+
+    if (refreshTimeout) {
+      clearTimeout(refreshTimeout);
+      refreshTimeout = null;
+    }
+
+    if (reconnectTimeout) {
+      clearTimeout(reconnectTimeout);
+      reconnectTimeout = null;
     }
   },
 };

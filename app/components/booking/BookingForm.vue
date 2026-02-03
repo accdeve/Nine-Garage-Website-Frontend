@@ -10,24 +10,12 @@ const bookingStore = useBookingStore();
 const serviceStore = useServiceStore();
 const toast = useToast();
 
-const vehicleTypes = [
-  { label: "Mobil", value: "car" },
-  { label: "Motor", value: "motorcycle" },
-];
-
 const agreedToTerms = ref(false);
 
-// Filter services based on vehicle type
 const filteredServices = computed(() => {
-  if (!bookingStore.formData.vehicle_type) return serviceStore.services;
-  return serviceStore.services.filter(
-    (s) =>
-      s.vehicle_type === bookingStore.formData.vehicle_type ||
-      s.vehicle_type === "both",
-  );
+  return serviceStore.services;
 });
 
-// Sync service options for the select menu
 watch(
   filteredServices,
   (newServices) => {
@@ -107,7 +95,8 @@ const selectedBranch = computed({
 
 watch(
   () => [bookingStore.formData.booking_date, bookingStore.formData.workshop_id],
-  () => {
+  ([date, id]) => {
+    console.log(`[BookingForm] Watch trigger: date=${date}, workshop_id=${id}`);
     bookingStore.fetchAvailability();
     bookingStore.subscribeToUpdates();
   },
@@ -139,6 +128,7 @@ const handleBeforeUnload = (event: BeforeUnloadEvent) => {
 
 onMounted(async () => {
   window.addEventListener("beforeunload", handleBeforeUnload);
+  console.log("[BookingForm] Mounted, initializing SSE...");
   bookingStore.subscribeToUpdates();
   if (serviceStore.services.length === 0) {
     await serviceStore.fetchServices();
@@ -224,14 +214,6 @@ onUnmounted(() => {
         />
       </UFormField>
 
-      <UFormField label="Jenis Kendaraan" required>
-        <URadioGroup
-          v-model="bookingStore.formData.vehicle_type"
-          :items="vehicleTypes"
-          class="flex gap-4"
-        />
-      </UFormField>
-
       <UFormField label="Nomor Plat Kendaraan" name="vehicle_plat" required>
         <UInput
           v-model="bookingStore.formData.vehicle_plat"
@@ -259,6 +241,22 @@ onUnmounted(() => {
         />
       </UFormField>
 
+      <UFormField label="Pilih Layanan" required>
+        <template v-if="totalEstimation" #description>
+          <span class="text-primary font-medium"
+            >Estimasi pengerjaan: {{ totalEstimation }}</span
+          >
+        </template>
+        <USelectMenu
+          v-model="selectedServiceNames"
+          placeholder="Pilih Layanan"
+          multiple
+          :items="bookingStore.serviceOptions"
+          class="w-full"
+          :loading="serviceStore.loading"
+        />
+      </UFormField>
+
       <div class="flex gap-4 items-start flex-wrap sm:flex-nowrap">
         <UFormField label="Tanggal Booking" required class="w-full sm:w-auto">
           <UCalendar
@@ -267,7 +265,7 @@ onUnmounted(() => {
             variant="soft"
             color="primary"
             :ui="{
-              base: 'data-selected:bg-blue-500 data-selected:text-white',
+              body: 'data-selected:bg-blue-500 data-selected:text-white',
             }"
             :min-value="bookingStore.originalBooking ? undefined : todayDate"
           />
@@ -292,22 +290,6 @@ onUnmounted(() => {
           </div>
         </UFormField>
       </div>
-
-      <UFormField label="Pilih Layanan" required>
-        <template #description v-if="totalEstimation">
-          <span class="text-primary font-medium"
-            >Estimasi pengerjaan: {{ totalEstimation }}</span
-          >
-        </template>
-        <USelectMenu
-          v-model="selectedServiceNames"
-          placeholder="Pilih Layanan"
-          multiple
-          :items="bookingStore.serviceOptions"
-          class="w-full"
-          :loading="serviceStore.loading"
-        />
-      </UFormField>
 
       <UFormField label="Asal Pembelian" required>
         <USelectMenu
