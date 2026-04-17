@@ -1,24 +1,27 @@
 <script setup lang="ts">
-const items = [
-  "https://picsum.photos/1200/600?random=1",
-  "https://picsum.photos/1200/600?random=2",
-  "https://picsum.photos/1200/600?random=3",
-  "https://picsum.photos/1200/600?random=4",
-  "https://picsum.photos/1200/600?random=5",
-  "https://picsum.photos/1200/600?random=6",
-];
+import { useHomeStore } from "~/stores/home";
+
+const homeStore = useHomeStore();
 </script>
 
 <template>
-  <section>
+  <section v-if="homeStore.carousel.length > 0">
     <UCarousel
       v-slot="{ item }"
       loop
-      :autoplay="{ delay: 2000 }"
-      :items="items"
+      :autoplay="{ delay: 4000 }"
+      :items="homeStore.carousel"
       :ui="{ item: 'basis-full' }"
     >
-      <img :src="item" class="w-full h-58.5 object-cover rounded-lg" >
+      <img
+        :src="item.image_url"
+        :alt="item.name"
+        class="w-full h-60 object-cover rounded-lg"
+      >
     </UCarousel>
   </section>
+  <section
+    v-else
+    class="w-full h-60 bg-neutral-200 rounded-lg flex items-center justify-center"
+  />
 </template>

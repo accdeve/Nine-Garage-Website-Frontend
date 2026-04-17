@@ -1,22 +1,21 @@
 <template>
-  <header
-    class="bg-white flex justify-between items-center px-6 py-1"
-  >
+  <header class="bg-white flex justify-between items-center px-6 py-1">
     <!-- LEFT -->
-    <div>
-      <div class="w-20 h-20">
+    <NuxtLink to="/">
+      <div class="w-10 h-10">
         <img
           src="/images/logo.png"
           alt="Logo"
           class="max-h-full object-contain"
-        >
+        />
       </div>
-    </div>
+    </NuxtLink>
 
     <!-- RIGHT -->
-    <div class="flex items-center gap-1">
-      <div class="w-5 h-5 bg-black rounded-full"/>
-      <button class="text-black">Login</button>
-    </div>
+    <NuxtLink to="/login">
+      <UButton leading-icon="i-lucide-user" variant="outline" size="sm"
+        >Login</UButton
+      >
+    </NuxtLink>
   </header>
 </template>

@@ -20,11 +20,11 @@ const menus = [
     to: '/promo',
     icon: 'i-lucide-percent'
   },
-  {
-    label: 'Community',
-    to: '/community',
-    icon: 'i-lucide-users'
-  },
+  // {
+  //   label: 'Community',
+  //   to: '/community',
+  //   icon: 'i-lucide-users'
+  // },
   {
     label: 'Account',
     to: '/account',
@@ -49,9 +49,9 @@ function isActive(path: string) {
       <button
         v-for="menu in menus"
         :key="menu.to"
-        @click="go(menu.to)"
         class="flex flex-col items-center justify-center flex-1 gap-1"
         :class="isActive(menu.to) ? 'text-primary' : 'text-gray-400'"
+        @click="go(menu.to)"
       >
         <UIcon :name="menu.icon" class="text-xl" />
         <span class="text-xs font-medium">

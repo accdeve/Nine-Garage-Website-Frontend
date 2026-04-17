@@ -1,52 +1,97 @@
 <script setup lang="ts">
 import { computed } from "vue";
-import { useTimeFormatter } from "~/composables/useTimeFormatter";
+import type { BookingAvailability } from "~/models/booking/booking";
 
 const props = withDefaults(
   defineProps<{
-    modelValue: number | null;
+    modelValue: string | null;
+    availability: BookingAvailability[];
     startHour?: number;
     endHour?: number;
+    originalHour?: string | null;
   }>(),
   {
     startHour: 8,
     endHour: 17,
+    originalHour: null,
   },
 );
 
 const emit = defineEmits<{
-  (e: "update:modelValue", value: number): void;
+  (e: "update:modelValue", value: string): void;
 }>();
 
-const hours = computed(() => {
-  const result: number[] = [];
+const displayHours = computed(() => {
+  if (props.availability.length > 0) {
+    return props.availability;
+  }
+
+  const result: BookingAvailability[] = [];
   for (let h = props.startHour; h <= props.endHour; h++) {
-    result.push(h);
+    const hourStr = `${h.toString().padStart(2, "0")}:00`;
+    result.push({ hour: hourStr, status: "available" });
   }
   return result;
 });
 
-const selectHour = (hour: number) => {
+const selectHour = (hour: string, status: string) => {
+  if (status !== "available") return;
   emit("update:modelValue", hour);
 };
-
-const { formatHour } = useTimeFormatter();
 </script>
 
 <template>
   <div class="grid grid-cols-2 grid-flow-row-dense gap-4">
     <div
-      v-for="hour in hours"
-      :key="hour"
-      class="cursor-pointer px-2 py-1 border rounded text-center text-sm w-16"
+      v-for="item in displayHours"
+      :key="item.hour"
+      class="px-2 py-1 border rounded text-center text-sm w-16 transition-all"
       :class="{
-        'border-green-300 text-green-300': modelValue === hour,
-        'border-gray-300': modelValue !== hour,
+        'border-blue-500 bg-blue-500 text-white font-bold ring-2 ring-blue-300':
+          item.hour === originalHour,
+        'border-primary-500 bg-primary-50 text-primary-700 font-bold ring-2 ring-primary-300':
+          modelValue === item.hour &&
+          item.hour !== originalHour &&
+          item.status === 'available',
+        'border-green-200 bg-green-50 text-green-700 cursor-pointer hover:border-green-500 hover:bg-green-100':
+          modelValue !== item.hour &&
+          item.hour !== originalHour &&
+          item.status === 'available',
+        'border-gray-200 bg-gray-50 text-gray-400 cursor-not-allowed':
+          (item.status === 'locked' ||
+            item.status === 'booked' ||
+            item.remaining_capacity === 0) &&
+          item.hour !== originalHour,
       }"
-      @click="selectHour(hour)"
+      @click="selectHour(item.hour, item.status)"
     >
-      <div class="text">    
-        {{ formatHour(hour) }}
+      <div>
+        {{ item.hour }}
+      </div>
+      <div
+        v-if="item.hour === originalHour"
+        class="text-[8px] uppercase font-bold"
+      >
+        Sebelumnya
+      </div>
+      <div
+        v-else-if="modelValue === item.hour"
+        class="text-[8px] uppercase font-bold"
+      >
+        {{ originalHour ? "Ganti" : "Dipilih" }}
+      </div>
+      <div
+        v-else-if="
+          item.status === 'locked' ||
+          item.status === 'booked' ||
+          item.remaining_capacity === 0
+        "
+        class="text-[8px] uppercase font-bold"
+      >
+        Full
+      </div>
+      <div v-else class="text-[8px] uppercase font-bold opacity-50">
+        Available
       </div>
     </div>
   </div>
